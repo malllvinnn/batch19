@@ -1,4 +1,4 @@
-﻿static void Foobar(int n)
+﻿void Foobar(int n)
 {
     for(int x = 1; x <= n; x++)
     {

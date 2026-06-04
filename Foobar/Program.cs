@@ -4,15 +4,15 @@
     {
         if (x % 3 == 0 && x % 5 == 0)
         {
-            Console.WriteLine("Foobar");
+            Console.WriteLine("foobar");
         }
         else if (x % 3 == 0)
         {
-            Console.WriteLine("Foo");
+            Console.WriteLine("foo");
         }
         else if (x % 5 == 0)
         {
-            Console.WriteLine("Bar");
+            Console.WriteLine("bar");
         }
         else
         {

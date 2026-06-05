@@ -1,0 +1,6 @@
+namespace StringsAndCharacters;
+
+class BelajarString
+{
+    
+}

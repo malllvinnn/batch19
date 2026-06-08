@@ -31,6 +31,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Struct", "Struct\Struct.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearnInterface", "LearnInterface\LearnInterface.csproj", "{165E5051-7630-40D3-84CC-259A93D148D3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearnEnums", "LearnEnums\LearnEnums.csproj", "{93178D19-6391-4F22-A811-9DCE25BA43E5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearnGenerics", "LearnGenerics\LearnGenerics.csproj", "{12170259-AAC4-4B86-9440-C8635B828133}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,6 +97,14 @@ Global
 		{165E5051-7630-40D3-84CC-259A93D148D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{165E5051-7630-40D3-84CC-259A93D148D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{165E5051-7630-40D3-84CC-259A93D148D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93178D19-6391-4F22-A811-9DCE25BA43E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93178D19-6391-4F22-A811-9DCE25BA43E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93178D19-6391-4F22-A811-9DCE25BA43E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93178D19-6391-4F22-A811-9DCE25BA43E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12170259-AAC4-4B86-9440-C8635B828133}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12170259-AAC4-4B86-9440-C8635B828133}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12170259-AAC4-4B86-9440-C8635B828133}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12170259-AAC4-4B86-9440-C8635B828133}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

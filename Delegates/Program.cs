@@ -16,16 +16,21 @@
                 return x * x * x;
             }
 
-            Transformer t = Square;
+            void Transform(int[] values, Transformer t)
+            {
+                for (int i = 0; i < values.Length; i++)
+                {
+                    values[i] = t(values[i]);
+                }
+            }
 
-            int result1 = t(3);
-            Console.WriteLine(result1);
-            // Output: 9
+            int[] values = { 1, 2, 3 };
 
-            t = Cube;
-            int result2 = t(3);
-            Console.WriteLine(result2);
-            // Output: 27
+            Transform(values, Square);
+            foreach (int v in values) Console.Write(v + " "); // 1 4 9
+
+            Transform(values, Cube);
+            foreach (int v in values) Console.Write(v + " "); // 1 64 729
         }
     }
 }

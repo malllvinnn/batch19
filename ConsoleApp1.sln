@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearnEnums", "LearnEnums\Le
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearnGenerics", "LearnGenerics\LearnGenerics.csproj", "{12170259-AAC4-4B86-9440-C8635B828133}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Delegates", "Delegates\Delegates.csproj", "{EABED490-A65A-49FF-A842-162BCD7DF435}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -105,6 +107,10 @@ Global
 		{12170259-AAC4-4B86-9440-C8635B828133}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12170259-AAC4-4B86-9440-C8635B828133}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12170259-AAC4-4B86-9440-C8635B828133}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EABED490-A65A-49FF-A842-162BCD7DF435}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EABED490-A65A-49FF-A842-162BCD7DF435}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EABED490-A65A-49FF-A842-162BCD7DF435}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EABED490-A65A-49FF-A842-162BCD7DF435}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

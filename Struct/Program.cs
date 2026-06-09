@@ -48,6 +48,12 @@
       // don't try re-assign
       // p21.X = 21; // ERROR
       // dst
+
+      // Struct if not assign object value
+      Member myMember = new Member();
+
+      Console.WriteLine($"Ini adalah member {myMember.Name}, usia {myMember.Age}");
+      // Output: Ini adalah member , usia 0
     }
   }
 }

@@ -89,6 +89,17 @@
 
       b2.Foo();
       // Output: BaseClass.Foo
+
+      // DOWNCAST
+      EmployeeSE malfinSE = new EmployeeSE("Malfin", "Junior SE");
+
+      Employee malfinBCAMP = malfinSE; // upcast
+      Console.WriteLine($"Name: {malfinBCAMP.Name}");
+      // Output Malfin
+
+      EmployeeSE mafleSE = (EmployeeSE)malfinBCAMP; // downcast
+      Console.WriteLine($"Name: {mafleSE.Name} (Mafle)");
+      // Output: Name: Malfin (Mafle)
     }
   }
 }

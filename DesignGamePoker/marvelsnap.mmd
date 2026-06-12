@@ -1,0 +1,273 @@
+classDiagram
+    Card <.. GameController
+    Card <.. Player
+    Card <.. Destination
+
+    LocationCard *-- LocationId
+    LocationCard <|-- Card
+
+    CharacterCard *-- CharacterId
+    CharacterCard <|-- Card
+
+    SummonCard *-- SummonId
+    SummonCard <|-- CharacterCard
+
+    Buff *-- BuffType
+    Buff *-- BuffOperation
+
+    CharacterCard o-- Buff
+
+    Deck *-- CharacterCard
+
+    Arena *-- ArenaId
+    Arena <.. Player
+    Arena *-- CharacterCard
+    Arena <.. LocationCard
+    Arena o-- Buff
+
+    Destination *-- DestinationType
+    Destination o-- ArenaId
+    Destination o-- Player
+
+    GameController <.. Player
+    GameController <.. Arena
+    GameController <.. CharacterCard
+    GameController <.. Deck
+    GameController *-- FutureTask
+    GameController *-- Destination
+    GameController o-- Buff
+
+    class Card {
+      <<Abstract>>
+      +int Id : readonly
+      +string Name : readonly
+      +string Description : readonly
+
+      +bool IsRevealed
+      +bool IsWithdrawable
+
+      #Card(int id, string name, string description)
+      #Card(Card other)
+
+      +OnReveal(Player player, GameController controller)* : void
+      +Ongoing(Player player, GameController controller)* : void
+      +OnDestroyed(Player player, GameController controller)* : void
+      +OnMoved(Player player, GameController controller, Destination from, Destination to)* : void
+      +Copy()* : Card
+    }
+
+    class LocationId {
+        <<Enumeration>>
+        Asgard = 1_000_000,
+        Atlantis,
+        Elysium,
+        ...
+    }
+
+    class CharacterId {
+        <<Enumeration>>
+        Forge = 0,
+        Thor,
+        CaptainAmerica,
+        ...
+    }
+
+    class SummonId {
+        <<Enumeration>>
+        SoulStone = 2_000_000,
+        PowerStone,
+        TimeStone,
+        ...
+    }
+
+    class LocationCard {
+        <<Abstract>>
+        #LocationCard(LocationId id, string name, string description)
+        #LocationCard(Card other)
+    }
+
+    class BuffType {
+        <<Enumeration>>
+        Power,
+        Energy,
+    }
+
+    class BuffOperation {
+        <<Enumeration>>
+        Multiply,
+        Add,
+    }
+
+    class Buff {
+        +int Id : readonly
+        +int Value : readonly
+        +BuffType Type : readonly
+        +BuffOperation Operation : readonly
+
+        +Buff(int id, int value, BuffType type, BuffOperation operation)
+
+        +Apply(int value) : int
+    }
+
+    class CharacterCard {
+        <<Abstract>>
+
+        -Dictionary<.int, List<.Buff>> _buffs
+
+        +int BaseEnergyCost : readonly
+        +int BasePower : readonly
+        +bool HasAbility : readonly
+
+        #CharacterCard(CharacterId id, string name, string description, int energyCost, int basePower, bool hasAbility)
+        #CharacterCard(int id, string name, string description, int energyCost, int basePower, bool hasAbility)
+        #CharacterCard(CharacterCard other)
+
+        +GetCurrentPower() : int
+        +GetEnergyCost() : int
+        +AddBuff(int ownerId, Buff buff) : void
+        +RemoveBuff(int ownerId, int buffId) : void
+        +ClearBuff(int ownerId) : void
+    }
+
+    class SummonCard {
+        <<Abstract>>
+        #SummonCard(SummonId id, string name, string description, int energyCost, int basePower, bool hasAbility)
+        #SummonCard(SummonCard other)
+    }
+
+    class Deck {
+      +int MaxCardCount$
+
+      -List<.CharacterCard> _cards
+
+      +int Id : readonly
+      +string Name
+
+      +Deck(int id, string name)
+
+      +Add(CharacterCard card) : bool
+      +Remove(CharacterCard card) : bool
+      +Contains(CharacterCard card) : bool
+      +Shuffle() : void
+      +Draw() : Card?
+      +IsFull() : bool
+      +Copy() : Deck
+    }
+
+    class ArenaId {
+        <<Enumeration>>
+        Arena1,
+        Arena2,
+        Arena3,
+    }
+
+    class Player {
+        +int Id : readonly
+        +string Name
+
+        +Player(int id, string name)
+    }
+
+    class Arena {
+        -Dictionary<.Player, List<.CharacterCard>> _cards
+        -Dictionary<.ArenaId, bool> _movableTo
+        -Dictionary<.int, List<.Buff>> _powerBuffs
+        -bool _isAvailable
+
+        +ArenaId Id : readonly
+        +LocationCard Location
+        +bool IsRevealable
+
+        +Arena(ArenaId id, Player player1, Player player2)
+
+        +SetLocation(LocationCard location) : void
+        +PutCard(Player player, CharacterCard card) : bool
+        +TakeCard(Player player, CharacterCard card) : bool
+        +TakeAllCards(Player player) : List<.CharacterCard>
+        +SetMovableTo(ArenaId id, bool isMovable) : bool
+        +IsMovableTo(ArenaId id) : bool
+        +AddPowerBuff(int ownerId, Buff buff) : void
+        +RemovePowerBuff(int ownerId, int buffId) : void
+        +ClearPowerBuff(int ownerId) : void
+        +SetAvailable(bool isAvailable) : void
+        +IsAvailable(Player player) : bool
+        +GetTotalPower(Player player) : int
+        +GetWinner() : Player
+        +HasPlayer(Player player) : bool
+    }
+
+    class FutureTask {
+        -int _turn
+
+        +int Id : readonly
+        +Action? Action
+
+        +FutureTask(int id, int turn)
+
+        +Run(int turn) : bool
+    }
+
+    class DestinationType {
+        <<Enumeration>>
+        Arena,
+        Deck,
+        Hand,
+        Graveyard,
+    }
+
+    class Destination {
+        +DestinationType Type : readonly
+        +Player Player : readonly
+        +ArenaId? ArenaId : readonly
+
+        +Destination(DestinationType type, Player player, ArenaId? arenaId)
+    }
+
+    class GameController {
+        +int MaxHandSize$
+        +int DefaultMaxTurn$
+
+        -List<.Player> _players
+        -Dictionary<.Player, List<.CharacterCard>> _cardInHands
+        -Dictionary<.Player, Deck?> _decks
+        -Dictionary<.ArenaId, Arena> _arenas
+        -Dictionary<.int, List<.FutureTask>> _futureTasks
+        -Dictionary<.int, List<.Buff>> _energyBuffs
+        -int _baseEnergy
+
+        +int Turn
+        +int MaxTurn
+
+        +Action<.int>? OnTurnChanged
+        +Action<.Player, Card>? OnCardRevealed
+        +Action<.Player, Card>? OnCardPowerChanged
+        +Action<.Card, Destination, Destination>? OnCardMoved
+        +Action<.Player>? OnGameEnded
+
+        +GameController(Player player1, Player player2)
+
+        +EndTurn() : void
+        +NextTurn() : bool
+        +SetDeck(Player player, Deck deck) : bool
+        +DrawCard(Player player) : bool
+        +AddCardInHand(Player player, CharacterCard card) : bool
+        +RemoveCardInHand(Player player, CharacterCard card) : bool
+        +HasCardInHand(Player player, CharacterCard card) : bool
+        +PutCardInArena(Player player, ArenaId arenaId, CharacterCard card) : bool
+        +TakeCardFromArena(Player player, ArenaId arenaId, CharacterCard card) : bool
+        +TakeAllCardsFromArena(Player player, ArenaId arenaId) : bool
+        +AddPowerBuffToArena(int ownerId, ArenaId arenaId, Buff buff)
+        +RemovePowerBuffFromArena(int ownerId, ArenaId arenaId, int buffId)
+        +ClearPowerBuffInArena(int ownerId, ArenaId arenaId)
+        +GetTotalPowerOfArena(Player player, ArenaId arenaId) : int
+        +CanMove(Player player, Card card, Destination from, Destination to) : bool
+        +AddFutureTask(int ownerId, FutureTask task) : void
+        +RemoveFutureTask(int ownerId, int taskId) : bool
+        +AddEnergyBuff(int ownerId, Buff buff) : bool
+        +RemoveEnergyBuff(int ownerId, int buffId) : bool
+        +NotifyCardRevealed(Player player, Card target) : void
+        +NotifyPowerChanged(Player player, Card target) : void
+        +NotifyCardMoved(Card target, Destination from, Destination to) : void
+        +GetPlayers() : List<.Player>
+        +HasPlayer(Player player) : bool
+    }

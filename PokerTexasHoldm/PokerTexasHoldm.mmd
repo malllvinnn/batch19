@@ -1,0 +1,113 @@
+classDiagram
+    direction TB
+
+    %% --- INHERITANCE / GENERALIZATION ---
+
+    %% --- COMPOSITION ---
+
+    %% --- DEPENDENCY / USAGE ---
+
+%%    ENUMERATION
+    class CardSuit {
+        <<enumeration>>
+        Spades
+        Hearts
+        Diamonds
+        Clubs
+    }
+    
+    class CardRank {
+        <<enumeration>>
+        Two = 2
+        Three
+        Four
+        Five
+        Six
+        Seven
+        Eight
+        Nine
+        Ten
+        Jack = 11
+        Queen = 12
+        King = 13
+        Ace = 14
+    }
+    
+    class HandRank {
+        <<enumeration>>
+        HighCard = 1
+        OnePair
+        TwoPair
+        ThreeOfAKind
+        Straight
+        Flush
+        FullHouse
+        FourOfAKind
+        StraightFlush
+        RoyalFlush
+    }
+    
+    class BettingAction {
+        <<enumeration>>
+        Fold
+        Check
+        Call
+        Raise
+        AllIn
+    }
+    
+    class GameRound {
+        <<enumeration>>
+        PreFlop
+        Flop
+        Turn
+        River
+        Showdown
+    }
+    
+    class PlayerStatus {
+        <<enumeration>>
+        Active
+        Folded
+        AllIn
+        Bust
+    }
+    
+%%    INTERFACES
+
+    class IRenderer {
+        <<interface>>
+        +DisplayTable(Table table, List~Player~ players, GameRound round, Pot pot) : void
+        +DisplayPlayerHand(Player player): void
+        +DisplayAllHand(List~HandResult~ results) : void
+        +DisplayWinner(List~HandResult~ winners, int potAmount) : void
+        +ClearScreen() : void
+        +WaitForPlayer(Player player) : void
+        +PromptAction(Player player, List~BettingAction~ allowedActions, int callAmount) : BettingAction
+        +PromptRaiseAmount(Player player, int minRaise) : int
+    }
+    
+    class IEvaluator {
+        <<interface>>
+        +Evaluate(Hand playerHand, Table table) : HandResult
+    }
+    
+%%    ABSTRACT CLASSES
+    
+    class Card {
+        <<Abstract>>
+        +CardSuit Suit : readonly
+        +CardRank Rank : readonly
+        +bool IsRevealed
+        
+        #Card(CardSuit suit, CardRank rank)
+        +ToString() : string
+        +GetPowerValue : int
+    }
+    
+%%    CONCRETE CLASSES
+    class HoleCard {
+        +HoleCard(CardSuit suit, CardRank rank)
+        +ToString() : string
+    }
+    

@@ -17,7 +17,7 @@
                 Console.WriteLine($"Error {ex.Message}");
             }
             // Output: Error Attempted to divide by zero.
-            
+
             // Multiple Exception
             try
             {
@@ -41,22 +41,58 @@
                 Console.WriteLine($"An unexpected error occurred: {ex.Message}");
             }
             // Output: Please provide at least one argument.
-            
+
             // Finally Practice
-            void ReadFile()
+            // void ReadFile()
+            // {
+            //     StreamReader reader = null;
+            //     try
+            //     {
+            //         reader = File.OpenText("file.txt");
+            //         Console.WriteLine(reader.ReadToEnd());
+            //     }
+            //     finally
+            //     {
+            //         reader?.Dispose();
+            //     }
+            // }
+            // ReadFile();
+
+            // using (StreamReader reader = File.OpenText("file.txt"))
+            // {
+            //     Console.WriteLine(reader.ReadToEnd());
+            // }
+
+            // void ReadFile()
+            // {
+            //     using var reader = File.OpenText("file.txt");
+            //     Console.WriteLine(reader.ReadToEnd());
+            // }
+            // ReadFile();
+
+            // Throwing Exception
+            void SayHello(string? name)
             {
-                StreamReader reader = null;
                 try
                 {
-                    reader = File.OpenText("file.txt");
-                    Console.WriteLine(reader.ReadToEnd());
+                    if (name == null | name?.Length == 0 | name == "")
+                        throw new ArgumentNullException(nameof(name), "Name cannot be null or empty.");
+
+                    Console.WriteLine($"Hello {name}");
                 }
-                finally
+                catch (ArgumentNullException ex)
                 {
-                    reader?.Dispose();
+                    Console.WriteLine($"Error Message: {ex.Message}");
+                    Console.WriteLine($"Error Stack Trace {ex.StackTrace}");
+                    Console.WriteLine($"Error Inner Exception {ex.InnerException?.Message}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An unexpected error occurred: {ex.Message}");
                 }
             }
-            ReadFile();
+            SayHello("");
+            // Error Name cannot be null or empty. (Parameter 'name')
         }
     }
 }

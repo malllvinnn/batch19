@@ -47,6 +47,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearnEnumerationAndIteratio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearnNullable", "LearnNullable\LearnNullable.csproj", "{4BB87020-9E67-4BF0-9A90-7D4FAB57A25D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokerTexasHoldm", "PokerTexasHoldm\PokerTexasHoldm.csproj", "{9B75AFCD-053D-4886-8A32-1BF4B67C6AE4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -141,6 +143,10 @@ Global
 		{4BB87020-9E67-4BF0-9A90-7D4FAB57A25D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4BB87020-9E67-4BF0-9A90-7D4FAB57A25D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4BB87020-9E67-4BF0-9A90-7D4FAB57A25D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B75AFCD-053D-4886-8A32-1BF4B67C6AE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B75AFCD-053D-4886-8A32-1BF4B67C6AE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B75AFCD-053D-4886-8A32-1BF4B67C6AE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B75AFCD-053D-4886-8A32-1BF4B67C6AE4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

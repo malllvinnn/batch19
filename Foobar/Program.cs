@@ -17,6 +17,14 @@
         else if (x % 3 == 0 && x % 5 == 0)
         {
             Console.WriteLine("foobar");
+        } 
+        else if (x % 9 == 0)
+        {
+            Console.WriteLine("huzz");
+        }
+        else if (x % 4 == 0)
+        {
+            Console.WriteLine("baz");
         }
         else if (x % 3 == 0)
         {

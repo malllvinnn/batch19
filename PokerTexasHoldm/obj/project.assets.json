@@ -8,19 +8,19 @@
     "net8.0": []
   },
   "packageFolders": {
-    "/home/mafle/.nuget/packages/": {}
+    "C:\\Users\\malfin\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/mafle/Dokumen/Learning/batch19/PokerTexasHoldm/PokerTexasHoldm.csproj",
+      "projectUniqueName": "C:\\Users\\malfin\\Documents\\batch19\\PokerTexasHoldm\\PokerTexasHoldm.csproj",
       "projectName": "PokerTexasHoldm",
-      "projectPath": "/home/mafle/Dokumen/Learning/batch19/PokerTexasHoldm/PokerTexasHoldm.csproj",
-      "packagesPath": "/home/mafle/.nuget/packages/",
-      "outputPath": "/home/mafle/Dokumen/Learning/batch19/PokerTexasHoldm/obj/",
+      "projectPath": "C:\\Users\\malfin\\Documents\\batch19\\PokerTexasHoldm\\PokerTexasHoldm.csproj",
+      "packagesPath": "C:\\Users\\malfin\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\malfin\\Documents\\batch19\\PokerTexasHoldm\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/home/mafle/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\malfin\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -38,6 +38,11 @@
         "warnAsError": [
           "NU1605"
         ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
       }
     },
     "frameworks": {
@@ -59,7 +64,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/lib64/dotnet/sdk/8.0.127/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.421/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

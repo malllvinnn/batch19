@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\malfin\\Documents\\batch19\\PokerTexasHoldm\\PokerTexasHoldm.csproj": {}
+    "/home/mafle/Dokumen/Learning/batch19/PokerTexasHoldm/PokerTexasHoldm.csproj": {}
   },
   "projects": {
-    "C:\\Users\\malfin\\Documents\\batch19\\PokerTexasHoldm\\PokerTexasHoldm.csproj": {
+    "/home/mafle/Dokumen/Learning/batch19/PokerTexasHoldm/PokerTexasHoldm.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\malfin\\Documents\\batch19\\PokerTexasHoldm\\PokerTexasHoldm.csproj",
+        "projectUniqueName": "/home/mafle/Dokumen/Learning/batch19/PokerTexasHoldm/PokerTexasHoldm.csproj",
         "projectName": "PokerTexasHoldm",
-        "projectPath": "C:\\Users\\malfin\\Documents\\batch19\\PokerTexasHoldm\\PokerTexasHoldm.csproj",
-        "packagesPath": "C:\\Users\\malfin\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\malfin\\Documents\\batch19\\PokerTexasHoldm\\obj\\",
+        "projectPath": "/home/mafle/Dokumen/Learning/batch19/PokerTexasHoldm/PokerTexasHoldm.csproj",
+        "packagesPath": "/home/mafle/.nuget/packages/",
+        "outputPath": "/home/mafle/Dokumen/Learning/batch19/PokerTexasHoldm/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\malfin\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "/home/mafle/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -32,11 +32,6 @@
           "warnAsError": [
             "NU1605"
           ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -58,7 +53,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.421/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/lib64/dotnet/sdk/8.0.127/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

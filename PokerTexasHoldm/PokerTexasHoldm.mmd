@@ -1,12 +1,46 @@
 classDiagram
     direction TB
-%% --- INHERITANCE / GENERALIZATION ---
 
-%% --- COMPOSITION ---
+%%  INHERITANCE
+    Card <|-- HoleCard
+    Card <|-- CommunityCard
+    IRenderer <|.. ConsoleRenderer
+    IEvaluator <|.. HandEvaluator
 
-%% --- DEPENDENCY / USAGE ---
+%%  COMPOSITION
+    Deck "1" *-- "52" Card : contains
+    Hand *-- HoleCard : hold
+    Table "1" *-- "0..5" CommunityCard : displays
+    Player "1" *-- "1" Hand : owns
+    GameController "1" *-- "1" Deck : manages
+    GameController "1" *-- "1" Table : manages
+    GameController "1" *-- "1" Pot : tracks
 
-%%    ENUMERATION
+%%  DEPENDECY / USAGE
+    Card ..> CardSuit : uses
+    Card ..> CardRank : uses
+    Player ..> PlayerStatus : tracks state
+    HandResult ..> Player : references
+    HandResult ..> HandRank : scores via
+    HandResult ..> Card : select best 5
+    Pot ..> Player : tracks contributions via Id
+    GameController ..> GameRound : tracks state
+    GameController ..> Player : controls
+    GameController ..> IRenderer : outputs to
+    GameController ..> IEvaluator : scores via
+    GameController ..> BettingRound : runs
+    IEvaluator ..> Hand : reads
+    IEvaluator ..> Table : reads
+    IEvaluator ..> HandResult : returns
+    IRenderer ..> Table : draws
+    IRenderer ..> Player : draws
+    IRenderer ..> Pot : draws
+    IRenderer ..> GameRound : draws
+    IRenderer ..> HandResult : draws
+    BettingRound ..> Player : sequences turns
+    BettingRound ..> BettingAction : processes
+
+%%  ENUMERATIONS
     class CardSuit {
         <<enumeration>>
         Spades
@@ -72,7 +106,7 @@ classDiagram
         Bust
     }
 
-%%    INTERFACES
+%%  INTERFACES
 
     class IRenderer {
         <<interface>>
@@ -91,7 +125,7 @@ classDiagram
         +Evaluate(Hand playerHand, Table table): HandResult
     }
 
-%%    ABSTRACT CLASSES
+%%  ABSTRACT CLASSES
 
     class Card {
         <<abstract>>
@@ -103,7 +137,7 @@ classDiagram
         +GetPowerValue: int
     }
 
-%%    CONCRETE CLASSES
+%%  CONCRETE CLASSES
     class HoleCard {
         +HoleCard(CardSuit suit, CardRank rank)
         +ToString(): string
@@ -195,5 +229,50 @@ classDiagram
         +GetCallAmount(Player player): int
         +GetMinRaise(): int
     }
-    
-    
+
+    class ConsoleRenderer {
+        +DisplayTable(Table table, List~Player~ players, GameRound round, Pot pot): void
+        +DisplayPlayerHand(Player player): void
+        +DisplayAllHands(List~HandResult~ results): void
+        +DisplayWinner(List~HandResult~ winners, int potAmount): void
+        +ClearScreen(): void
+        +WaitForPlayer(Player player): void
+        +PromptAction(Player player, List~BettingAction~ allowedActions, int callAmount): BettingAction
+        +PromptRaiseAmount(Player player, int minRaise): int
+    }
+
+    class GameController {
+        -List~Player~ _players
+        -Deck _deck
+        -Table _table
+        -Pot _pot
+        -IRenderer _renderer
+        -IEvaluator _evaluator
+        -int _dealerIndex
+        -int _smallBlindAmount
+        -int _bigBlindAmount
+        +GameRound CurrentRound
+        +int CurrentHighestBet
+        +int MinBet
+        +Action~GameRound~ ? OnRoundChanged
+        +Action~Player, BettingAction, int~ ? OnPlayerActed
+        +Action~List~Player~~ ? OnGameEnded
+        +Action~Table~ ? OnCommunityCardsDealt
+        +GameController(List~Player~ players, int sb, int bb, IRenderer renderer, IEvaluator evaluator)
+        +StartGame(): void
+        -StartNewHand(): void
+        -PostBlinds(): void
+        -DealHoleCards(): void
+        -RunBettingRound(): void
+        -ProcessPlayerTurn(Player player): void
+        -DealFlop(): void
+        -DealTurn(): void
+        -DealRiver(): void
+        -RunShowdown(): void
+        -AwardPot(List~HandResult~ results): void
+        -RotateDealer(): void
+        -GetActivePlayers(): List~Player~
+        -GetCallAmount(Player player): int
+        -GetMinRaise(): int
+    }
+

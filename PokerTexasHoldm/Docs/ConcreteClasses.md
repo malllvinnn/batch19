@@ -369,3 +369,295 @@ menyimpan status data permainan apa pun
         9. `IsOnePair`: Cek apakah ada sepasang kartu dengan angka kembar yang sama
         10. `High Card` (Jika semua fungsi di atas mereturn false, otomatis kartu pemain hanya dihitung berdasarkan
             angka tertinggi yang dipegangnya)
+
+## Betting Round
+
+```plantuml
+class BettingRound {
+    -List~Player~ _activePlayers
+    -int _currentHighestBet
+    -int _minRaise
+    +BettingRound(List~Player~ players, int minBet)
+    +ProcessAction(Player player, BettingAction action, int amount) : bool
+    +GetNextPlayer() : Player
+    +IsRoundOver() : bool
+    +GetCallAmount(Player player) : int
+    +GetMinRaise() : int
+}
+```
+
+- Class ini bertanggung jawab penuh untuk mengontrol alur taruhan, menentukan giliran pemain secara bergantian, serta
+  memproses dan memvalidasi setiap aksi taruhan di setiap babak permainan (_Pre-Flop_, _Flop_, _Turn_, _River_)
+
+### Fields
+
+- `-List~Player~ _activePlayers`
+    - Daftar koleksi objek pemain (`List<Player>`)
+    - Menyimpan daftar pemain yang masih berhak ikut bertaruh di babak ini
+    - Jika ada pemain yang melakukan _Fold_ (menyerah) atau _Bust_ (bangkrut), mereka akan langsung dikeluarkan dari
+      list internal ini agar sistem tidak memberikan giliran bertaruh lagi kepada mereka
+- `-int _currentHighestBet`
+    - Angka murni (`int`)
+    - Mencatat nominal taruhan tertinggi yang sedang aktif di atas meja pada babak tersebut
+    - Angka ini menjadi jangkar/patokan bagi pemain berikutnya untuk menentukan biaya yang harus dibayar jika ingin
+      bertahan
+- `-int _minRaise`
+    - Angka murni (`int`)
+    - Mencatat batas minimal jika ada pemain yang ingin menaikkan taruhan (_Raise_)
+    - Ini dirancang agar pemain tidak bisa menginterupsi permainan dengan menaikkan taruhan dalam jumlah yang tidak
+      sah (misal cuma menaikkan 1 chip di meja besar)
+
+### Constructor
+
+- `+BettingRound(List<Player> players, int minBet)`
+    - Menghidupkan siklus taruhan baru setiap kali babak permainan berpindah (misal saat transisi dari Pre-Flop ke Flop)
+    - Constructor ini bertugas menerima data kiriman dari luar
+        - Parameter `players` (daftar pemain aktif saat itu) ditangkap dan dimasukkan ke dalam _private field_
+          `_activePlayers`
+        - Parameter `minBet` (aturan taruhan minimum game) ditangkap dan disuntikkan untuk mengisi nilai awal pada
+          _field_ `_currentHighestBet` dan `_minRaise`
+
+### Methods
+
+- `+ProcessAction(Player player, BettingAction action, int amount) : boo`
+    - Eksekutor utama untuk memproses tindakan taruhan yang diambil oleh pemain
+    - Menerima objek `player` yang sedang mendapat giliran, opsi aksinya dari enum `BettingAction` (
+      _Check/Call/Raise/Fold_), dan nominal chip yang dilibatkan (`amount`)
+    - Method ini akan melakukan validasi ketat
+    - Misal, jika pemain memilih _Raise_ tapi `amount`-nya di bawah `_minRaise`, atau chip di dompet `player.Chips`
+      tidak cukup, method ini akan mereturn `false` (aksi ditolak)
+    - Jika valid, method akan memotong chip pemain, memperbarui field `_currentHighestBet`, mengubah status pemain, dan
+      mereturn `true` (sah)
+- `+GetNextPlayer() : Player`
+    - Menentukan dan mengembalikan objek pemain berikutnya yang berhak mengambil keputusan aksi
+    - Menggunakan algoritma perputaran melingkar (_Round Robin_) berdasarkan indeks di dalam list `_activePlayers`
+    - Method ini akan melewati pemain yang sudah tidak memenuhi syarat bertaruh, lalu mengembalikan objek `Player`
+      tersebut ke `GameController`
+- `+IsRoundOver() : bool`
+    - Pengecekan krusial untuk mengetahui apakah babak taruhan saat ini sudah boleh ditutup atau belum
+    - Mengembalikan nilai boolean (`true`/`false`)
+    - Babak taruhan dinyatakan selesai (`true`) jika **semua pemain aktif sudah mendapatkan giliran bertindak DAN
+      nominal taruhan (`CurrentRoundBet`) semua pemain yang tersisa di meja sudah bernilai sama/setara**
+    - Jika ada yang menaikkan taruhan (_Raise_), lingkaran giliran akan diperpanjang sampai semua orang menyamakan
+      taruhannya
+- `+GetCallAmount(Player player) : int`
+    - Menghitung biaya "uang aman" yang harus dikeluarkan oleh pemain jika ingin memilih opsi bertahan (_Call_)
+    - Menerima objek player yang bersangkutan, lalu melakukan operasi matematika dasar:
+        - Nilai `_currentHighestBet` (Taruhan Tertinggi Meja) dikurangi dengan `player.CurrentRoundBet` (Chip yang sudah
+          ditaruhkan si player di babak ini).
+        - Selisih angka itulah yang dikembalikan sebagai nilai biaya `Call`
+- `+GetMinRaise() : int`
+    - Mengambil dan mengembalikan batas minimal chip untuk aksi interupsi taruhan
+    - Mereturn nilai dari field private `_minRaise`.
+    - Nilai ini sangat dibutuhkan oleh `IRenderer` agar bisa menampilkan informasi panduan angka minimal input pada
+      layar antarmuka (_UI/Console_) pemain
+
+## Console Renderer
+
+```plantuml
+class ConsoleRenderer {
+    +DisplayTable(Table table, List~Player~ players, GameRound round, Pot pot) : void
+    +DisplayPlayerHand(Player player) : void
+    +DisplayAllHands(List~HandResult~ results) : void
+    +DisplayWinner(List~HandResult~ winners, int potAmount) : void
+    +ClearScreen() : void
+    +WaitForPlayer(Player player) : void
+    +PromptAction(Player player, List~BettingAction~ allowedActions, int callAmount) : BettingAction
+    +PromptRaiseAmount(Player player, int minRaise) : int
+}
+```
+
+- Class ini bertanggung jawab penuh untuk menangani urusan visual, mencetak informasi permainan ke layar terminal, serta
+  menangkap input interaksi langsung dari pemain
+
+### Methods
+
+- `+DisplayTable(Table table, List<Player> players, GameRound round, Pot pot) : void`
+    - Method utama untuk menggambar "panggung permainan" poker secara keseluruhan di layar terminal
+    - Menerima paket data lengkap dari luar:
+        - objek `table` (untuk menggambar kartu komunitas),
+        - daftar `players` (untuk mencetak nama, sisa chip, dan taruhan tiap orang),
+        - status babak `round` (_Pre-Flop/Flop/Turn/River_), dan objek pot (untuk menampilkan total hadiah di tengah
+          meja)
+    - Method ini murni melakukan _Read-Only_ pada data tersebut untuk dicetak secara rapi
+- `+DisplayPlayerHand(Player player) : void`
+    - Mencetak 2 lembar kartu rahasia (_Hole Cards_) milik satu pemain spesifik secara eksklusif ke layar
+    - Menerima objek `player`, lalu mengakses properti `player.Hand.GetCards()`
+    - Di sinilah method `ToString()` milik kartu rahasia dipanggil tanpa sensor agar pemain yang sedang mendapat giliran
+      bisa melihat kartunya sendiri secara privat
+- `+DisplayAllHands(List<HandResult> results) : void`
+    - Membuka dan menampilkan seluruh kartu milik semua pemain yang bertahan di akhir ronde (_Showdown_)
+    - Menerima daftar sertifikat skor `List<HandResult>` dari mesin evaluator
+    - Method ini akan membongkar kasta ranking (`Rank`) dan 5 kartu terbaik (`BestFiveCards`) milik tiap-tiap pemain
+      agar semua orang di meja tahu kombinasi kartu apa saja yang saling diadu
+- `+DisplayWinner(List<HandResult> winners, int potAmount) : void`
+    - Mengumumkan siapa pemenang ronde tersebut beserta total chip hadiah yang berhasil dibawa pulang
+    - Menerima list objek `winners` (bisa lebih dari satu orang jika hasilnya seri/_Split Pot_) dan nominal total hadiah
+      `potAmount` untuk dicetak dengan efek teks yang dramatis di terminal sebagai penutup ronde
+- `+ClearScreen() : void`
+    - Membersihkan seluruh teks lama yang ada di terminal console (menggunakan perintah semacam `Console.Clear()`)
+    - Menjaga agar tampilan terminal tetap bersih, rapi, dan tidak menumpuk memanjang ke bawah setiap kali giliran
+      pemain berpindah
+- `+WaitForPlayer(Player player) : void`
+    - Menahan jalannya program sementara waktu (seperti `Console.ReadLine()`) dan menampilkan teks _"Tekan Enter untuk
+      melanjutkan giliran..."_
+    - Memberikan jeda waktu agar pemain bisa membaca situasi meja sebelum layar dibersihkan oleh `ClearScreen()`, serta
+      mencegah pemain lain mengintip kartu rahasia milik pemain yang sedang bertindak
+- `+PromptAction(Player player, List<BettingAction> allowedActions, int callAmount) : BettingAction`
+    - Menampilkan menu pilihan aksi taruhan di layar dan memaksa pemain untuk memilih salah satu opsi yang sah
+    - Menerima data `player` yang bertindak, daftar opsi aksi yang diizinkan saat itu (`allowedActions`), dan biaya yang
+      dibutuhkan jika ingin _Call_ (`callAmount`).
+    - Method ini akan menangkap input ketikan angka/huruf dari keyboard pemain, lalu mengembalikan (return) pilihan
+      tersebut dalam bentuk enum `BettingAction` ke sistem
+- `+PromptRaiseAmount(Player player, int minRaise) : int`
+    - Membuka kotak input nominal chip jika pemain sebelumnya memilih aksi menaikkan taruhan (_Raise_)
+    - Menerima objek `player` (untuk validasi batas maksimal chip-nya) dan batas bawah kenaikan `minRaise`.
+    - Method ini akan melakukan perulangan input (input validation loop):
+        - jika pemain mengetik angka di bawah minRaise atau melebihi sisa chip-nya,
+        - terminal akan menampilkan pesan error dan meminta input ulang sampai angkanya valid,
+        - baru kemudian mereturn nilai angka murni `int` tersebut
+
+## Game Controller
+
+```plantuml
+class GameController {
+    -List~Player~ _players
+    -Deck _deck
+    -Table _table
+    -Pot _pot
+    -IRenderer _renderer
+    -IEvaluator _evaluator
+    -int _dealerIndex
+    -int _smallBlindAmount
+    -int _bigBlindAmount
+    +GameRound CurrentRound
+    +int CurrentHighestBet
+    +int MinBet
+    +Action~GameRound~? OnRoundChanged
+    +Action~Player, BettingAction, int~? OnPlayerActed
+    +Action~List~Player~~? OnGameEnded
+    +Action~Table~? OnCommunityCardsDealt
+    +GameController(List~Player~ players, int sb, int bb, IRenderer renderer, IEvaluator evaluator)
+    +StartGame() : void
+    -StartNewHand() : void
+    -PostBlinds() : void
+    -DealHoleCards() : void
+    -RunBettingRound() : void
+    -ProcessPlayerTurn(Player player) : void
+    -DealFlop() : void
+    -DealTurn() : void
+    -DealRiver() : void
+    -RunShowdown() : void
+    -AwardPot(List~HandResult~ results) : void
+    -RotateDealer() : void
+    -GetActivePlayers() : List~Player~
+    -GetCallAmount(Player player) : int
+    -GetMinRaise() : int
+}
+```
+
+- Class ini adalah pusat kendali (_Core Engine_) yang mengatur seluruh alur permainan Texas Hold'em dari awal hingga
+  akhir ronde selesai
+
+### Fields
+
+Seluruh field di bawah ini bertanda private (`-`) karena merupakan rahasia dapur jalannya status game yang tidak boleh
+diotak-atik secara acak dari luar kelas
+
+- `-List<Player> _players`
+    - Menyimpan daftar utama seluruh pemain yang terdaftar di dalam meja game
+- `-Deck _deck`
+    - Objek tumpukan kartu yang digunakan untuk mengocok dan membagikan kartu di setiap hand baru
+- `-Table _table`
+    - Objek meja yang menampung 5 kartu komunitas (_Flop, Turn, River_)
+- `-Pot _pot`
+    - Objek bendahara taruhan yang mengelola kontribusi chip dari para pemain
+- `-IRederer _renderer`
+    - Komponen visual (berupa _Interface_) yang digunakan untuk menggambar UI ke layar.
+    - Ini memungkinkan game bertukar UI dengan mudah tanpa merusak logika game
+- `-IEvaluator _evaluator`
+    - Komponen mesin hitung kartu (berupa _Interface_) untuk menguji kekuatan kombinasi kartu pemain
+- `-int _dealerIndex`
+    - Angka penanda posisi tombol Dealer (_Button_) yang berputar searah jarum jam di setiap hand baru
+- `-int _smallBlindAmount`
+    - Nominal chip yang wajib dikeluarkan oleh pemain di posisi _Small Blind_
+- `-int _bigBlindAmount`
+    - Nominal chip taruhan wajib minimal untuk posisi _Big Blind_
+
+### Properties
+
+- `+GameROund CurrentRound`
+    - Properti publik untuk melacak babak yang sedang berjalan saat ini (_Pre-Flop, Flop, Turn, River, Showdown_)
+- `+int CurrentHighestBet`
+    - Mencatat angka taruhan tertinggi global di meja pada babak berjalan
+- `+int MinBet`
+    - atas minimal taruhan awal yang diizinkan di meja tersebut
+
+### Events
+
+Bagian ini menggunakan _Action<>_ (Delegates) bertanda _?_ (_nullable_) yang berfungsi untuk memicu kejadian tertentu
+agar kelas luar (seperti sistem suara, log, atau UI eksternal) bisa ikut merespons secara reaktif tanpa merusak
+encapsulation:
+
+- `+Action<GameRound>? OnRoundChanged`
+    - Dipicu setiap kali babak permainan berpindah
+- `+Action<Player, BettingAction, int>? OnPlayerActed`
+    - Dipicu ketika seorang pemain selesai mengambil tindakan taruhannya
+- `+Action<List<Player>>? OnGameEnded`
+    - Dipicu ketika game selesai dan menentukan status akhir pemain
+- `+Action<Table>? OnCommunityCardsDealt`
+    - Dipicu saat kartu komunitas baru selesai dibuka di atas meja
+
+### Constructor
+
+- `+GameController(List<Player> players, int sb, int bb, IRenderer renderer, IEvaluator evaluator)`
+    - Konstruktor utama penanggung jawab merakit seluruh pondasi game
+    - Menerima pasokan data esensial dari luar.
+    - Parameter `players`, `sb` (_small blind_), dan `bb` (_big blind_) ditangkap untuk mengisi field internal.
+    - Parameter `renderer` dan `evaluator` disuntikkan ke field berbasis _Interface_ (_Dependency Injection_). Di dalam
+      constructor ini pula objek `_deck`, `_table`, dan `_pot` dilahirkan secara internal menggunakan keyword `new`
+
+### Methods
+
+- `+StartGame() : void`
+    - Menyalakan sakelar game utama.
+    - Method ini berisi perulangan _looping_ utama game agar permainan terus berjalan ronde demi ronde selama masih ada
+      minimal 2 pemain yang memiliki chip di meja
+- `-StartNewHand() : void`
+    - Menyiapkan ulang meja untuk ronde kartu baru:
+        - membersihkan kartu meja,
+        - meminta `_pot.Reset()`,
+        - meminta `_deck` mengocok ulang kartu,
+        - dan mengatur ulang posisi _blinds_
+- `-PostBlinds() : void`
+    - Memaksa dua pemain di sebelah kiri Dealer untuk menyetorkan chip taruhan wajib (_Small Blind_ & _Big Blind_)
+      langsung ke dalam objek `_pot`
+- `-DealHoleCards() : void`
+    - Membagikan 2 kartu rahasia secara privat dari `_deck` ke masing-masing tangan pemain
+- `-RunBettingRound() : void`
+    - Menghidupkan objek `BettingRound` untuk mengelola siklus giliran bertaruh pemain (_Check, Call, Raise, Fold_)
+      sampai babak taruhan tersebut dinyatakan seimbang/selesai
+- `-ProcessPlayerTurn(Player player) : void`
+    - Berkoordinasi dengan `_renderer` untuk menampilkan menu opsi taruhan yang sah ke layar komputer pemain dan
+      menangkap keputusan aksi yang dipilih pemain tersebut
+- `-DealFlop() : void`
+    - Membuka 3 kartu komunitas pertama di atas meja
+- -`DealTurn() : void`
+    - Membuka kartu komunitas ke-4 di atas meja
+- `-DealRiver() : void`
+    - Membuka kartu komunitas ke-5 (terakhir) di atas meja
+- `-RunShowdown() : void`
+    - Mengumpulkan semua pemain yang tersisa, lalu mengirimkan kartu mereka ke `_evaluator` untuk dihitung kombinasi
+      terbaiknya.
+    - Hasilnya berupa list `HandResult` yang siap diurutkan kekuatannya
+- `-AwardPot(List~HandResult~ results) : void`
+    - Menentukan siapa pemenang mutlak berdasarkan urutan skor tertinggi, lalu menyerahkan seluruh chip yang terkumpul
+      di properti `_pot.TotalChips` ke dompet pemain yang menang
+- `-RotateDealer() : void`
+    - Menggeser posisi tombol Dealer (`_dealerIndex`) ke pemain berikutnya searah jarum jam untuk babak selanjutnya
+- `-GetActivePlayers() : List~Player~`
+    - Fungsi pembantu untuk menyaring dan mengembalikan daftar pemain yang chip-nya belum habis dan statusnya belum
+      melakukan Fold
+- `-GetCallAmount(Player player) : int` dan `-GetMinRaise() : int`
+    - Fungsi internal untuk membantu menghitung kalkulasi matematika nominal taruhan yang harus dilempar ke komponen UI
+      penampil layar

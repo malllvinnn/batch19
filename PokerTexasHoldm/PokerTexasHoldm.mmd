@@ -1,48 +1,14 @@
 classDiagram
     direction TB
 
-%%  INHERITANCE
-    Card <|-- HoleCard
-    Card <|-- CommunityCard
-    IRenderer <|.. ConsoleRenderer
-    IEvaluator <|.. HandEvaluator
+    %% Dependency
+    Card ..> CardSuit
+    Card ..> CardRank
 
-%%  COMPOSITION
-    Deck "1" *-- "52" Card : contains
-    Hand *-- HoleCard : hold
-    Table "1" *-- "0..5" CommunityCard : displays
-    Player "1" *-- "1" Hand : owns
-    GameController "1" *-- "1" Deck : manages
-    GameController "1" *-- "1" Table : manages
-    GameController "1" *-- "1" Pot : tracks
+    %% Enumeration
 
-%%  DEPENDECY / USAGE
-    Card ..> CardSuit : uses
-    Card ..> CardRank : uses
-    Player ..> PlayerStatus : tracks state
-    HandResult ..> Player : references
-    HandResult ..> HandRank : scores via
-    HandResult ..> Card : select best 5
-    Pot ..> Player : tracks contributions via Id
-    GameController ..> GameRound : tracks state
-    GameController ..> Player : controls
-    GameController ..> IRenderer : outputs to
-    GameController ..> IEvaluator : scores via
-    GameController ..> BettingRound : runs
-    IEvaluator ..> Hand : reads
-    IEvaluator ..> Table : reads
-    IEvaluator ..> HandResult : returns
-    IRenderer ..> Table : draws
-    IRenderer ..> Player : draws
-    IRenderer ..> Pot : draws
-    IRenderer ..> GameRound : draws
-    IRenderer ..> HandResult : draws
-    BettingRound ..> Player : sequences turns
-    BettingRound ..> BettingAction : processes
-
-%%  ENUMERATIONS
     class CardSuit {
-        <<enumeration>>
+        <<Enumeration>>
         Spades
         Hearts
         Diamonds
@@ -50,7 +16,7 @@ classDiagram
     }
 
     class CardRank {
-        <<enumeration>>
+        <<Enumeration>>
         Two = 2
         Three
         Four
@@ -66,213 +32,46 @@ classDiagram
         Ace = 14
     }
 
-    class HandRank {
-        <<enumeration>>
-        HighCard = 1
-        OnePair
-        TwoPair
-        ThreeOfAKind
-        Straight
-        Flush
-        FullHouse
-        FourOfAKind
-        StraightFlush
-        RoyalFlush
-    }
-
-    class BettingAction {
-        <<enumeration>>
-        Fold
-        Check
-        Call
-        Raise
-        AllIn
-    }
-
-    class GameRound {
-        <<enumeration>>
-        PreFlop
-        Flop
-        Turn
-        River
-        Showdown
-    }
-
-    class PlayerStatus {
-        <<enumeration>>
-        Active
-        Folded
-        AllIn
-        Bust
-    }
-
-%%  INTERFACES
-
-    class IRenderer {
-        <<interface>>
-        +DisplayTable(Table table, List~Player~ players, GameRound round, Pot pot): void
-        +DisplayPlayerHand(Player player): void
-        +DisplayAllHand(List~HandResult~ results): void
-        +DisplayWinner(List~HandResult~ winners, int potAmount): void
-        +ClearScreen(): void
-        +WaitForPlayer(Player player): void
-        +PromptAction(Player player, List~BettingAction~ allowedActions, int callAmount): BettingAction
-        +PromptRaiseAmount(Player player, int minRaise): int
-    }
-
-    class IEvaluator {
-        <<interface>>
-        +Evaluate(Hand playerHand, Table table): HandResult
-    }
-
-%%  ABSTRACT CLASSES
+    %% class HandRank {
+    %%     <<Enumeration>>
+    %%     HighCard = 1
+    %%     OnePair
+    %%     TwoPair
+    %%     ThreeOfAKind
+    %%     Straight
+    %%     Flush
+    %%     FullHouse
+    %%     FourOfAKind
+    %%     StraightFlush
+    %%     RoyalFlush
+    %% }
 
     class Card {
-        <<abstract>>
-        +CardSuit Suit: readonly
-        +CardRank Rank: readonly
+        +CardSuit Card
+        +CardRank Rank
         +bool IsRevealed
-        #Card(CardSuit suit, CardRank rank)
-        +ToString(): string
-        +GetPowerValue: int
-    }
-
-%%  CONCRETE CLASSES
-    class HoleCard {
-        +HoleCard(CardSuit suit, CardRank rank)
-        +ToString(): string
-    }
-
-    class CommunityCard {
-        +CommunityCard(CardSuit suit, CardRank rank)
-        +ToString(): string
-    }
-
-    class Deck {
-        -List~Card~ _card
-        -Random _random
-        +Deck()
-        +Shuffle(): void
-        +Deal(): Card
-        +Reset(): void
-    }
-
-    class Hand {
-        -List~HoleCard~ _card
-        +Hand()
-        +AddCard(HoleCard card): void
-        +GetCards(): List~HoleCard~
-        +Clear(): void
-    }
-
-    class Table {
-        -List~CommunityCard~ _communityCards
-        +Table()
-        +AddCommunityCard(CommunityCard card): void
-        +GetCommunityCards(): List~CommunityCard~
-        +Clear(): void
     }
 
     class Player {
-        +int Id: readonly
-        +string Name: readonly
-        +int Chips
-        +int CurrentRoundBet
-        +PlayerStatus Status
-        +Hand Hand: readonly
-        +Player(int id, string name, int initialChips)
-        +PlaceBet(int amount): int
-        +WinPot(int amount): void
-        +ResetRoundBet(): void
-        +IsActive(): bool
+        +int Id
+        +string Name
     }
 
     class Pot {
-        -Dictionary~int, int~ _contributions
-        +int TotalChips
-        +Pot()
-        +AddContribution(int playerId, int amount): void
-        +GetContribution(int playerId): int
-        +Reset(): void
+
     }
 
-    class HandResult {
-        +Player Player: readonly
-        +HandRank Rank: readonly
-        +List~Card~ BestFiveCards: readonly
-        +HandResult(Player player, HandRank rank, List~Card~ bestFive)
-        +CompareTo(HandResult other): int
+    class Deck {
+        +List~Card~ Cards
+        +Shuffle() : void
+        +Deal() : void
     }
 
-    class HandEvaluator {
-        +Evaluate(Hand playerHand, Table table): HandResult
-        -EvaluateBestFive(List~Card~ allCards): HandResult
-        -IsRoyalFlush(List~Card~ cards): bool
-        -IsStraightFlush(List~Card~ cards): bool
-        -IsFourOfAKind(List~Card~ cards): bool
-        -IsFullHouse(List~Card~ cards): bool
-        -IsFlush(List~Card~ cards): bool
-        -IsStraight(List~Card~ cards): bool
-        -IsThreeOfAKind(List~Card~ cards): bool
-        -IsTwoPair(List~Card~ cards): bool
-        -IsOnePair(List~Card~ cards): bool
-    }
-
-    class BettingRound {
-        -List~Player~ _activePlayers
-        -int _currentHighestBet
-        -int _minRaise
-        +BettingRound(List~Player~ players, int minBet)
-        +ProcessAction(Player player, BettingAction action, int amount): bool
-        +GetNextPlayer(): Player
-        +IsRoundOver(): bool
-        +GetCallAmount(Player player): int
-        +GetMinRaise(): int
-    }
-
-    class ConsoleRenderer {
-        +DisplayTable(Table table, List~Player~ players, GameRound round, Pot pot): void
-        +DisplayPlayerHand(Player player): void
-        +DisplayAllHands(List~HandResult~ results): void
-        +DisplayWinner(List~HandResult~ winners, int potAmount): void
-        +ClearScreen(): void
-        +WaitForPlayer(Player player): void
-        +PromptAction(Player player, List~BettingAction~ allowedActions, int callAmount): BettingAction
-        +PromptRaiseAmount(Player player, int minRaise): int
+    class Table {
+        +List~Card~ CommunityCards
     }
 
     class GameController {
-        -List~Player~ _players
-        -Deck _deck
-        -Table _table
-        -Pot _pot
-        -IRenderer _renderer
-        -IEvaluator _evaluator
-        -int _dealerIndex
-        -int _smallBlindAmount
-        -int _bigBlindAmount
-        +GameRound CurrentRound
-        +int CurrentHighestBet
-        +int MinBet
-        +Action~GameRound~ ? OnRoundChanged
-        +Action~Player, BettingAction, int~ ? OnPlayerActed
-        +Action~List~Player~~ ? OnGameEnded
-        +Action~Table~ ? OnCommunityCardsDealt
-        +GameController(List~Player~ players, int sb, int bb, IRenderer renderer, IEvaluator evaluator)
-        +StartGame(): void
-        -StartNewHand(): void
-        -PostBlinds(): void
-        -DealHoleCards(): void
-        -RunBettingRound(): void
-        -ProcessPlayerTurn(Player player): void
-        -DealFlop(): void
-        -DealTurn(): void
-        -DealRiver(): void
-        -RunShowdown(): void
-        -AwardPot(List~HandResult~ results): void
-        -RotateDealer(): void
-        -GetActivePlayers(): List~Player~
-        -GetCallAmount(Player player): int
-        -GetMinRaise(): int
+
     }
 

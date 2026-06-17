@@ -2,13 +2,26 @@ classDiagram
     direction TB
 
     %% Dependency
-    Card ..> CardSuit
-    Card ..> CardRank
+    Card ..> CardSuit : uses
+    Card ..> CardRank : uses
+    Player ..> PlayerStatus : uses
+    Pot ..> Player : uses
+    GameController ..> BettingAction : uses
+    GameController ..> GameRound : uses
+    GameController ..> HandRank : uses
+
+
+    %% Composition
+    Deck "1" *-- "52" Card : contains
+    Table "1" *-- "0..5" Card : contains
+    GameController "1" *-- "1" Deck : manages
+    GameController "1" *-- "1" Table : manages
+    GameController "1" *-- "1" Pot : manages
+    GameController "1" *-- "2..10" Player : manages
 
     %% Enumeration
-
     class CardSuit {
-        <<Enumeration>>
+        <<enumeration>>
         Spades
         Hearts
         Diamonds
@@ -16,7 +29,7 @@ classDiagram
     }
 
     class CardRank {
-        <<Enumeration>>
+        <<enumeration>>
         Two = 2
         Three
         Four
@@ -32,39 +45,68 @@ classDiagram
         Ace = 14
     }
 
-    %% class HandRank {
-    %%     <<Enumeration>>
-    %%     HighCard = 1
-    %%     OnePair
-    %%     TwoPair
-    %%     ThreeOfAKind
-    %%     Straight
-    %%     Flush
-    %%     FullHouse
-    %%     FourOfAKind
-    %%     StraightFlush
-    %%     RoyalFlush
-    %% }
+    class PlayerStatus {
+        <<enumeration>>
+        Active
+        Folded
+        AllIn
+        Bust
+    }
+
+    class BettingAction {
+        <<enumeration>>
+        Fold
+        Check
+        Call
+        Raise
+        AllIn
+    }
+
+    class GameRound {
+        <<enumeration>>
+        PreFlop
+        Flop
+        Turn
+        River
+        Showdown
+    }
+
+    class HandRank {
+        <<enumeration>>
+        HighCard = 1
+        OnePair
+        TwoPair
+        ThreeOfAKind
+        Straight
+        Flush
+        FullHouse
+        FourOfAKind
+        StraightFlush
+        RoyalFlush
+    }
 
     class Card {
-        +CardSuit Card
+        +CardSuit Suit
         +CardRank Rank
         +bool IsRevealed
+        +ToString() string
     }
 
     class Player {
         +int Id
         +string Name
+        +PlayerStatus Status
     }
 
     class Pot {
-
+        +Dictionary~Player, int~ Contributions
+        +int TotalChips
     }
 
     class Deck {
         +List~Card~ Cards
         +Shuffle() : void
-        +Deal() : void
+        +Deal() : Card
     }
 
     class Table {
@@ -72,6 +114,39 @@ classDiagram
     }
 
     class GameController {
+        -Dictionary~Player, List~Card~~ _hands
+        -Dictionary~Player, int~~ _chips
+        -int _dealerIndex
+        -int _smallBlind
+        -int _bigBlind
+        -GameRound _gameRound
+
+        +Action~GameRound~ OnRoundChanged
+        +Action~Player~ OnWinnerDecided
+
+        +StartGame() : void
+        +AddPlayer(string name, int chips) : void
+        +Fold(Player player) : void
+        +Check(Player player) : void
+        +Call(Player player) : void
+        +Raise(Player player) : void
+        +AllIn(Player player) : void
+        +GetPlayerChips(Player player) : int
+        +GetPlayerHand(Player player) : List~Card~
+        +GetCommunityCards() : List~Card~
+        +GetPot() : Pot
+        +GetCurrentRound() : GameRound
+        +GetWinner() : Player
+
+        -PostBlinds() : void
+        -DealHoleCards() : void
+        -DealFlop() : void
+        -DealTurn() : void
+        -DealRiver() : void
+        -RunShowdown() : void
+        -EvaluateHand(Player player) : HandRank
+        -AwardPot(Player player) : void
+        -RotateDealer() : void
 
     }
 

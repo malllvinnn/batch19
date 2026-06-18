@@ -14,10 +14,10 @@ classDiagram
     %% Composition
     Deck "1" *-- "52" Card : contains
     Table "1" *-- "0..5" Card : contains
-    GameController "1" *-- "1" Deck : manages
-    GameController "1" *-- "1" Table : manages
-    GameController "1" *-- "1" Pot : manages
-    GameController "1" *-- "2..10" Player : manages
+    GameController "1" *-- "1" Deck : contains
+    GameController "1" *-- "1" Table : contains
+    GameController "1" *-- "1" Pot : contains
+    GameController "1" *-- "2..10" Player : contains
 
     %% Enumeration
     class CardSuit {

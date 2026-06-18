@@ -114,12 +114,16 @@ classDiagram
     }
 
     class GameController {
-        -Dictionary~Player, List~Card~~ _hands
-        -Dictionary~Player, int~~ _chips
+        -Dictionary~Player, List~Card~ _hands
+        -Dictionary~Player, int~ _chips
         -int _dealerIndex
         -int _smallBlind
         -int _bigBlind
-        -GameRound _gameRound
+        -GameRound _currentRound
+        -Deck _deck
+        -Table _table
+        -Pot _pot
+        -List~Player~ _players
 
         +Action~GameRound~ OnRoundChanged
         +Action~Player~ OnWinnerDecided
@@ -129,7 +133,7 @@ classDiagram
         +Fold(Player player) : void
         +Check(Player player) : void
         +Call(Player player) : void
-        +Raise(Player player) : void
+        +Raise(Player player, int amount) : void
         +AllIn(Player player) : void
         +GetPlayerChips(Player player) : int
         +GetPlayerHand(Player player) : List~Card~
@@ -147,6 +151,5 @@ classDiagram
         -EvaluateHand(Player player) : HandRank
         -AwardPot(Player player) : void
         -RotateDealer() : void
-
     }
 

@@ -138,18 +138,18 @@ classDiagram
         +GetCommunityCards() : List~Card~
         +GetPot() : Pot
         +GetCurrentRound() : GameRound
-        +GetWinner() : Player
+        +GetWinner() : List~Player~
 
-        -ShuffleDeck() : void
-        -DealDeck() : Card
         -PostBlinds() : void
+        -ShuffleDeck() : void
+        -DealCard() : Card
         -DealHoleCards() : void
         -DealFlop() : void
         -DealTurn() : void
         -DealRiver() : void
         -RunShowdown() : void
         -EvaluateHand(Player player) : HandRank
-        -AwardPot(Player player) : void
+        -AwardPot(List~Player~ winner) : void
         -RotateDealer() : void
     }
 

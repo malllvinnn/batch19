@@ -105,8 +105,6 @@ classDiagram
 
     class Deck {
         +List~Card~ Cards
-        +Shuffle() : void
-        +Deal() : Card
     }
 
     class Table {
@@ -114,7 +112,7 @@ classDiagram
     }
 
     class GameController {
-        -Dictionary~Player, List~Card~ _hands
+        -Dictionary~Player, List~Card~~ _hands
         -Dictionary~Player, int~ _chips
         -int _dealerIndex
         -int _smallBlind
@@ -142,6 +140,8 @@ classDiagram
         +GetCurrentRound() : GameRound
         +GetWinner() : Player
 
+        -ShuffleDeck() : void
+        -DealDeck() : Card
         -PostBlinds() : void
         -DealHoleCards() : void
         -DealFlop() : void

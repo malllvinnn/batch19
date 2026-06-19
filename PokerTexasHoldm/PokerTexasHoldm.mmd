@@ -2,22 +2,32 @@ classDiagram
     direction TB
 
     %% Dependency
-    Card ..> CardSuit : uses
-    Card ..> CardRank : uses
-    Player ..> PlayerStatus : uses
-    Pot ..> Player : uses
+    ICard ..> CardSuit : uses
+    ICard ..> CardRank : uses
+    IPlayer ..> PlayerStatus : uses
+    IPot ..> IPlayer : uses
     GameController ..> BettingAction : uses
     GameController ..> GameRound : uses
     GameController ..> HandRank : uses
+    GameController ..> ICard : uses
 
 
     %% Composition
-    Deck "1" *-- "52" Card : contains
-    Table "1" *-- "0..5" Card : contains
-    GameController "1" *-- "1" Deck : contains
-    GameController "1" *-- "1" Table : contains
-    GameController "1" *-- "1" Pot : contains
-    GameController "1" *-- "2..10" Player : contains
+    Deck "1" *-- "52" ICard : contains
+    Table "1" *-- "0..5" ICard : contains
+    GameController "1" *-- "1" IDeck : contains
+    GameController "1" *-- "1" ITable : contains
+    GameController "1" *-- "1" IPot : contains
+    GameController "1" *-- "2..10" IPlayer : contains
+    GameController "1" *-- "*" IChip : contains
+
+    %% Relazation
+    IChip <|.. Chip : implements
+    ICard <|.. Card : implements
+    IPlayer <|.. Player : implements
+    IPot <|.. Pot : implements
+    IDeck <|.. Deck : implements
+    ITable <|.. Table : implements
 
     %% Enumeration
     class CardSuit {
@@ -85,70 +95,121 @@ classDiagram
         RoyalFlush
     }
 
+    %% Interface
+    class IChip {
+        <<Interface>>
+        +int Amount
+    }
+
+    class ICard {
+        <<Interface>>
+        +CardSuit Suit
+        +CardRank Rank
+        +bool IsRevealed
+        +ToString() : string
+    }
+
+    class IPlayer {
+        <<Interface>>
+        +string Name
+        +PlayerStatus Status
+    }
+
+    class IPot {
+        <<Interface>>
+        +Dictionary~IPlayer, int~ Contributions
+        +int TotalChips
+    }
+
+    class IDeck {
+        <<Interface>>
+        +List~ICard~ Cards
+    }
+
+    class ITable {
+        <<Interface>>
+        +List~ICard~ CommunityCards
+    }
+
+    %% Concrete Class
+    class Chip {
+        +int Amount
+        +Chip(int amount)
+    }
+
     class Card {
         +CardSuit Suit
         +CardRank Rank
         +bool IsRevealed
+        +Card(CardSuit suit, CardRank rank)
         +ToString() string
     }
 
     class Player {
         +string Name
         +PlayerStatus Status
+        +Player(string name)
     }
 
     class Pot {
-        +Dictionary~Player, int~ Contributions
+        +Dictionary~IPlayer, int~ Contributions
         +int TotalChips
+        +Pot()
     }
 
     class Deck {
-        +List~Card~ Cards
+        +List~ICard~ Cards
+        +Deck()
     }
 
     class Table {
-        +List~Card~ CommunityCards
+        +List~ICard~ CommunityCards
+        +Table()
     }
 
     class GameController {
-        -Dictionary~Player, List~Card~~ _hands
-        -Dictionary~Player, int~ _chips
+        %% Porperties / Field
+        -Dictionary~IPlayer, List~ICard~~ _hands
+        -Dictionary~IPlayer, List~IChip~~ _chips
         -int _dealerIndex
         -int _smallBlind
         -int _bigBlind
         -GameRound _currentRound
-        -Deck _deck
-        -Table _table
-        -Pot _pot
-        -List~Player~ _players
+        -IDeck _deck
+        -ITable _table
+        -IPot _pot
+        -List~IPlayer~ _players
 
+        %% Event Notification
         +Action~GameRound~ OnRoundChanged
-        +Action~Player~ OnWinnerDecided
+        +Action~List~IPlayer~~ OnWinnerDecided
 
+        %% API yang dipublish
         +StartGame() : void
         +AddPlayer(string name, int chips) : void
-        +Fold(Player player) : void
-        +Check(Player player) : void
-        +Call(Player player) : void
-        +Raise(Player player, int amount) : void
-        +AllIn(Player player) : void
-        +GetPlayerChips(Player player) : int
-        +GetPlayerHand(Player player) : List~Card~
-        +GetCommunityCards() : List~Card~
-        +GetPot() : Pot
+        +Fold(IPlayer player) : void
+        +Check(IPlayer player) : void
+        +Call(IPlayer player) : void
+        +Raise(IPlayer player, int amount) : void
+        +AllIn(IPlayer player) : void
+        +GetPlayerChips(IPlayer player) : int
+        +GetPlayerHand(IPlayer player) : List~ICard~
+        +GetCommunityCards() : List~ICard~
+        +GetPot() : IPot
         +GetCurrentRound() : GameRound
-        +GetWinner() : List~Player~
+        +GetWinner() : List~IPlayer~
 
+        %% Logic Bisnis
         -PostBlinds() : void
         -ShuffleDeck() : void
-        -DealCard() : Card
+        -DealCard() : ICard
         -DealHoleCards() : void
         -DealFlop() : void
         -DealTurn() : void
         -DealRiver() : void
         -RunShowdown() : void
-        -EvaluateHand(Player player) : HandRank
-        -AwardPot(List~Player~ winner) : void
+        -EvaluateHand(IPlayer player) : HandRank
+        -AwardPot(List~IPlayer~ winner) : void
         -RotateDealer() : void
     }
 

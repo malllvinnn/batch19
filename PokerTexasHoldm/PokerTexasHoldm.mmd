@@ -6,20 +6,22 @@ classDiagram
     ICard ..> CardRank : uses
     IPlayer ..> PlayerStatus : uses
     IPot ..> IPlayer : uses
+    GameController ..> ICard : uses
     GameController ..> BettingAction : uses
     GameController ..> GameRound : uses
+    GameController ..> GameState : uses
     GameController ..> HandRank : uses
-    GameController ..> ICard : uses
+    GameController ..> PlayerStatus : uses
 
 
     %% Composition
     Deck "1" *-- "52" ICard : contains
     Table "1" *-- "0..5" ICard : contains
+    GameController "1" *-- "*" IChip : contains
     GameController "1" *-- "1" IDeck : contains
     GameController "1" *-- "1" ITable : contains
-    GameController "1" *-- "1" IPot : contains
+    GameController "1" *-- "1..*" IPot : contains
     GameController "1" *-- "2..10" IPlayer : contains
-    GameController "1" *-- "*" IChip : contains
 
     %% Relazation
     IChip <|.. Chip : implements
@@ -79,6 +81,14 @@ classDiagram
         Turn
         River
         Showdown
+    }
+
+    class GameState {
+        <<enumeration>>
+        WaitingForPlayers
+        InProgress
+        HandComplete
+        GameOver
     }
 
     class HandRank {
@@ -168,48 +178,99 @@ classDiagram
     }
 
     class GameController {
-        %% Porperties / Field
-        -Dictionary~IPlayer, List~ICard~~ _hands
+        %% Porperties / Field / State
         -Dictionary~IPlayer, List~IChip~~ _chips
+        -Dictionary~IPlayer, List~ICard~~ _holeCards
+        -Dictionary~IPlayer, int~ _currentBets
+        -List~IPlayer~ _players
+        -List~IPot~ _pots
+        -IDeck _deck
+        -ITable _table
         -int _dealerIndex
+        -int _currentPlayerIndex
+        -int _lastRaiserIndex
+        -int _lastRaiseAmount
+        -int _currentHighestBet
         -int _smallBlind
         -int _bigBlind
         -GameRound _currentRound
-        -IDeck _deck
-        -ITable _table
-        -IPot _pot
-        -List~IPlayer~ _players
+        -GameState _gameState
 
         %% Event Notification
         +Action~GameRound~ OnRoundChanged
-        +Action~List~IPlayer~~ OnWinnerDecided
+        +Action~List~IPlayer~~ OnHandWinnersDecided
 
-        %% API yang dipublish
-        +StartGame() : void
+        %% Contructor
+        +GameController(int smallBlind, int bigBlind)
+
+        %% Lifecycle public
         +AddPlayer(string name, int chips) : void
+        +StartGame() : void
+        +StartNextHand() : void
+
+        %% Get Info Game and Round
+        +GetGameState() : GameState
+        +GetCurrentRound() : GameRound
+        +IsGameOver() : bool
+        +GetGameWinner() : IPlayer
+        +GetHandWinners() : List~IPlayer~
+
+        %% Get Info Players
+        +GetCurrentPlayer() : IPlayer
+        +GetAllPlayers() : List~IPlayer~
+        +GetDealer() : IPlayer
+        +GetPlayerStatus(IPlayer player) : PlayerStatus
+        +GetPlayerHoleCards(IPlayer player) : List~ICard~
+
+        %% Get Info Chips and Betting
+        +GetPlayerChips(IPlayer player) : List~IChip~
+        +GetPlayerTotalChips(IPlayer player) : int
+        +GetPlayerCurrentBet(IPlayer player) : int
+        +GetSmallBlind() : int
+        +GetBigBlind() : int
+        +GetCurrentHighestBet() : int
+        +GetCallAmount(IPlayer player) : int
+        +GetMinRaise() : int
+        +GetAvailableBettingAction(IPlayer player) : List~BettingAction~
+
+        %% Get Info Cards and Pot
+        +GetCommunityCards() : List~ICard~
+        +GetMainPot() : IPot
+        +GetSidePots() : List~IPot~
+        +GetTotalPotAmount() : int
+
+        %% Action Public
         +Fold(IPlayer player) : void
         +Check(IPlayer player) : void
         +Call(IPlayer player) : void
         +Raise(IPlayer player, int amount) : void
         +AllIn(IPlayer player) : void
-        +GetPlayerChips(IPlayer player) : int
-        +GetPlayerHand(IPlayer player) : List~ICard~
-        +GetCommunityCards() : List~ICard~
-        +GetPot() : IPot
-        +GetCurrentRound() : GameRound
-        +GetWinner() : List~IPlayer~
 
-        %% Logic Bisnis
-        -PostBlinds() : void
+        %% Logic Bisnis Hand Setup
+        -StartNewHand() : void
         -ShuffleDeck() : void
-        -DealCard() : ICard
+        -RotateDealer() : void
+        -PostBlinds() : void
+
+        %% Logic Bisnis Dealing
         -DealHoleCards() : void
+        -DealCard() : ICard
         -DealFlop() : void
         -DealTurn() : void
         -DealRiver() : void
         -RunShowdown() : void
+
+        %% Logic Bisnis Betting Flow
+        -RunBettingRound() : void
+        -NextPlayer() : void
+        -IsBettingRoundOver() : bool
+        -ResolveIfOnePlayerLeft() : void
+
+        %% Logic Bisnis Resolution
         -EvaluateHand(IPlayer player) : HandRank
-        -AwardPot(List~IPlayer~ winner) : void
-        -RotateDealer() : void
+        -CompareHands(List~IPlayer~ player) : List~IPlayer~
+        -CreateSidePots() : void
+        -AwardPot() : void
+        -EliminateBustedPlayers() : void
     }
 

@@ -51,6 +51,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokerTexasHoldm", "PokerTex
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearnCollection", "LearnCollection\LearnCollection.csproj", "{158EFF96-8B68-42AA-822F-3F814136F7E5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearnStringBasic", "LearnStringBasic\LearnStringBasic.csproj", "{D3954552-9D7C-4510-8FB6-E420A99ECB45}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -153,6 +155,10 @@ Global
 		{158EFF96-8B68-42AA-822F-3F814136F7E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{158EFF96-8B68-42AA-822F-3F814136F7E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{158EFF96-8B68-42AA-822F-3F814136F7E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3954552-9D7C-4510-8FB6-E420A99ECB45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3954552-9D7C-4510-8FB6-E420A99ECB45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3954552-9D7C-4510-8FB6-E420A99ECB45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3954552-9D7C-4510-8FB6-E420A99ECB45}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -2,28 +2,56 @@ namespace Foobar;
 
 class LogicExercise
 {
-    public void AddRule(int n)
+    public string AddRule(int input)
     {
-        for (var x = 1; x <= n; x++)
+        List<string> listOfOutput = new List<string>();
+
+        for (var x = 1; x <= input; x++)
+        {
             if (x % 3 == 0 && x % 5 == 0 && x % 7 == 0)
-                Console.WriteLine("foobarjazz");
+            {
+                listOfOutput.Add("foobarjazz");
+            }
             else if (x % 5 == 0 && x % 7 == 0)
-                Console.WriteLine("barjazz");
+            {
+                listOfOutput.Add("barjazz");
+            }
             else if (x % 3 == 0 && x % 7 == 0)
-                Console.WriteLine("foojazz");
+            {
+                listOfOutput.Add("foojazz");
+            }
             else if (x % 3 == 0 && x % 5 == 0)
-                Console.WriteLine("foobar");
+            {
+                listOfOutput.Add("foobar");
+            }
             else if (x % 9 == 0)
-                Console.WriteLine("huzz");
+            {
+                listOfOutput.Add("huzz");
+            }
             else if (x % 4 == 0)
-                Console.WriteLine("baz");
+            {
+                listOfOutput.Add("baz");
+            }
             else if (x % 3 == 0)
-                Console.WriteLine("foo");
+            {
+                listOfOutput.Add("foo");
+            }
             else if (x % 5 == 0)
-                Console.WriteLine("bar");
+            {
+                listOfOutput.Add("bar");
+            }
             else if (x % 7 == 0)
-                Console.WriteLine("jazz");
+            {
+                listOfOutput.Add("jazz");
+            }
             else
-                Console.WriteLine(x);
+            {
+                listOfOutput.Add(x.ToString());
+            }
+        }
+
+        string output = string.Join(" ", listOfOutput);
+
+        return output;
     }
 }

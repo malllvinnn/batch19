@@ -2,4 +2,4 @@
 
 LogicExercise myClass = new LogicExercise();
 
-myClass.AddRule(200);
+Console.WriteLine(myClass.AddRule(200));
